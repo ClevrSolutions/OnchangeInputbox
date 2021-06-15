@@ -50,6 +50,16 @@
             <description>The nanoflow to execute whenever input text changes</description>
             <returnType type="Void"/>
         </property>
+        <property key="beforeJs" type="string" required="false" multiline="true">
+            <caption>Before JS snippet</caption>
+            <category>Custom JavaScript</category>
+            <description>Run this JavaScript snippet before onchange microflow/nanoflow execution</description>
+        </property>
+        <property key="afterJs" type="string" required="false" multiline="true">
+            <caption>After JS snippet</caption>
+            <category>Custom JavaScript</category>
+            <description>Run this JavaScript snippet after onchange microflow/nanoflow execution</description>
+        </property>
         <property key="onLeaveEvent" type="enumeration" defaultValue="doNothing">
             <caption>On leave event</caption>
             <category>Events</category>

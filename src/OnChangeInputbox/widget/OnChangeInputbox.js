@@ -131,13 +131,15 @@ define([
                     this.onChangeEvent === "callMicroflow" &&
                     this.onchangemf
                 ) {
-                    this._executeMicroflow(this.onchangemf);
+                    this._executeAspectCode("before");
+                    this._executeMicroflow(this.onchangemf, lang.hitch(this, "_executeAspectCode", "after"));
                 } else if (
                     this.onChangeEvent === "callNanoflow" &&
                     this.onChangeNanoflow.nanoflow &&
                     this.mxcontext
                 ) {
-                    this._executeNanoflow(this.onChangeNanoflow);
+                    this._executeAspectCode("before");
+                    this._executeNanoflow(this.onChangeNanoflow, lang.hitch(this, "_executeAspectCode", "after"));
                 } else if (this.onChangeEvent === "doNothing") {
                     return;
                 } else {
@@ -168,25 +170,30 @@ define([
                 }
             },
 
-            _executeNanoflow: function(nanoflow) {
+            _executeNanoflow: function(nanoflow, callback) {
                 logger.debug(this.id + " _executeNanoflow");
                 if (nanoflow && this._contextObj) {
+                    this._executeAspectCode("before");
                     mx.data.callNanoflow({
                         nanoflow: nanoflow,
                         origin: this.mxform,
                         context: this.mxcontext,
+                        callback: function() {
+                            callback && callback();
+                        },
                         error: function(error) {
                             mx.ui.error(
                                 "An error occurred while executing the Nanoflow: " +
                                     error.message
                             );
                             console.error(error.message);
+                            callback && callback();
                         }
                     });
                 }
             },
 
-            _executeMicroflow: function(microflow) {
+            _executeMicroflow: function(microflow, callback) {
                 logger.debug(this.id + " _executeMicroflow");
                 if (microflow && this._contextObj) {
                     mx.data.action({
@@ -196,14 +203,32 @@ define([
                             applyto: "selection",
                             guids: [this._contextObj.getGuid()]
                         },
+                        callback: function() {
+                            callback && callback();
+                        },
                         error: function(error) {
                             mx.ui.error(
                                 "An error occurred while executing the Microflow: " +
                                     error.message
                             );
                             console.error(error.message);
+                            callback && callback();
                         }
                     });
+                }
+            },
+
+            /**
+             * @param {"before"|"after"} type
+             */
+            _executeAspectCode: function(type) {
+                var customCode = (type === "before") ? this.beforeJs : this.afterJs;
+                if (customCode) {
+                    try {
+                        eval(customCode);
+                    } catch (error) {
+                        logger.debug(this.id, "Error while running custom code", error);
+                    }
                 }
             },
 

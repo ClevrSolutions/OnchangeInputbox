@@ -1,6 +1,6 @@
 {
   "name": "OnChangeInputbox",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "This inputbox widget supports the firing of a microflow or nanoflow for every keystroke. This is great for example with live previews.",
   "private": true,
   "dependencies": {},
